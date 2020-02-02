@@ -1,8 +1,9 @@
-package verificador;
+package impl;
 
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 
-import encoder.Encoder;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -12,15 +13,22 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 
-public class LerRDF extends Encoder { 
+import crawler.SemanticCrawler;
+
+public class SemanticCrawlerImpl implements SemanticCrawler { 
 		ArrayList<String> visited_uris;
 		
-		public LerRDF() {
+		public SemanticCrawlerImpl() {
 			this.visited_uris = new ArrayList<String>();
 		}
-
-		public void verifica(StmtIterator statements) {
+		
+		@Override
+		public void search(Model graph, String resourceURI) {
+			// TODO Auto-generated method stub
+			StmtIterator statements = graph.listStatements((Resource)null, OWL.sameAs, (RDFNode)null);
+			
 			hasNextStatement(statements);
+			
 		}
 		
 		private void hasNextStatement(StmtIterator statements) {
@@ -68,11 +76,19 @@ public class LerRDF extends Encoder {
 			}
 		}
 		
+		public boolean charsetEncoder(String uri) {
+	        CharsetEncoder enc = Charset.forName("ISO-8859-1").newEncoder();
+	        if ( enc.canEncode(uri) ) {
+	            return true;
+	        } else {
+	            return false;
+	        }
+	    }
+		
 		private void entraObjeto(RDFNode statement, ArrayList<String> visited_uris) {
 			String uri = statement.asResource().getURI();
-			
-			Encoder enc = new Encoder();
-			if (enc.charsetEncoder(uri)) {
+
+			if (charsetEncoder(uri)) {
 				if (visited_uris.contains(uri)) {
 					return;
 				} else {
